@@ -1,0 +1,45 @@
+#########################################################################################################
+#                                                                                                       #
+#  The Scripts were created to simlipyfy the Openstack Installation for General Users.                  #
+#                                                                                                       #
+#  Created Date : 26 March 2013                                                                         #
+#                                                                                                       #
+#  Created By : Shivaram Y & Shyam Y                                                                    #
+#                                                                                                       #
+#  Support Gorups : Cloudconverge & Cloudhyd                                                            #
+#                                                                                                       #
+#  Email: yshivaram@yahoo.com & yedurushyam@hotmail.com                                                 #
+#                                                                                                       #
+#########################################################################################################
+
+We are creating a loop back device to creat Nova Volumes '/dev/loop0' the same we are using.
+First create a file withe require space then attach that file to loopback device.
+So first we are creating the file with 2GB for testing,so we have taken 1MB of block size with 2048 Blocks which is 2GB.
+we are using the 'dd' command to create a file at '/var/novavol' never create it in 'dev' folder.
+
+root@opstack:~# dd if=/dev/zero of=/var/novavol bs=1M count=2048
+2048+0 records in
+2048+0 records out
+2147483648 bytes (2.1 GB) copied, 39.7397 s, 54.0 MB/s
+
+Now we are creating a loop device loop0 with 'losetup' command, the device will be available at '/dev/loop0'
+
+root@opstack:~#losetup /dev/loop0 /var/novavol
+
+The device is created, to enable this device on reboot then add the line '/sbin/losetup /dev/loop0 /var/novavol' before 'exit' line in '/etc/rc.local' file.
+
+Now create Volume so type
+
+root@opstack:~# pvcreate /dev/loop0
+  Physical volume "/dev/loop0" successfully created
+root@opstack:~#
+
+Now create a Volume group with the below command 'vgcreate nova-volumes /dev/"harddisk with partition number"
+
+root@opstack:~# vgcreate nova-volumes /dev/loop0
+  Volume group "nova-volumes" successfully created
+root@opstack:~#
+
+Now the volume create .
+Proceed to Nova Installation.
+

@@ -1,0 +1,82 @@
+#########################################################################################################
+#                                                                                                       #
+#  The Scripts were created to simlipyfy the Openstack Installation for General Users.                  #
+#                                                                                                       #
+#  Created Date : 26 March 2013                                                                         #
+#                                                                                                       #
+#  Created By : Shivaram Y & Shyam Y                                                                    #
+#                                                                                                       #
+#  Support Gorups : Cloudconverge & Cloudhyd                                                            #
+#                                                                                                       #
+#  Email: yshivaram@yahoo.com & yedurushyam@hotmail.com                                                 #
+#                                                                                                       #
+#########################################################################################################
+
+If you have a separate harddisk the type 'fdisk /dev/"harddisk" 'here in the example we have a separate harddisk
+'/dev/vdb' the same we are using.
+issue the command 'fdisk /dev/vdb' then press 'p' to print the partitions, it is a new hardisk without any partition.
+Now press 'n' to create new partition,if you have more partitions then press 'e' for extended partitions or 'p' for primary partition.
+Now provide the partition number , we have taken '1' as it is a new harddisk.
+Now press enter when it prompts for First sector with some number 'eg: First sector (2048-2097151, default 2048):'
+then for Last sector you can provide as per your wish eg to give 100GB then type '+100G' 
+now the partition is created now we should change the partition type to linuc lvm the number is '8e', fot this press
+'t' then type '8e' then to save changes and exit from fdisk type 'wr'
+then type 'sync' to sync. now the partition is created. see the below output which should look similar.
+ 
+root@opstack:~# fdisk  /dev/vdb
+
+Command (m for help): p
+
+Disk /dev/vdb: 1073 MB, 1073741824 bytes
+16 heads, 63 sectors/track, 2080 cylinders, total 2097152 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x9d22eb72
+
+   Device Boot      Start         End      Blocks   Id  System
+
+Command (m for help): n
+Partition type:
+   p   primary (0 primary, 0 extended, 4 free)
+   e   extended
+Select (default p): p
+Partition number (1-4, default 1): 1
+First sector (2048-2097151, default 2048): 
+Using default value 2048
+Last sector, +sectors or +size{K,M,G} (2048-2097151, default 2097151): 
+Using default value 2097151
+
+Command (m for help): t
+Selected partition 1
+Hex code (type L to list codes): 8e
+Changed system type of partition 1 to 8e (Linux LVM)
+
+Command (m for help): wr
+The partition table has been altered!
+
+Calling ioctl() to re-read partition table.
+Syncing disks.
+
+root@opstack:~#partprobe
+root@opstack:~#
+Now create Volume so type
+pvcreate /dev/"harddisk with partition number"
+we have created one partition '1'on 'vbd' harddisk for lvm, so we are using vdb1 the number may change as per your creation.
+
+root@opstack:~# pvcreate /dev/vdb1
+  Physical volume "/dev/vdb1" successfully created
+root@opstack:~#
+
+Now create a Volume group with the below command 'vgcreate nova-volumes /dev/"harddisk with partition number"
+we have created one partition '1'on 'vbd' harddisk for lvm, so we are using vdb1 the number may change as per your creation.
+
+root@opstack:~# vgcreate nova-volumes /dev/vdb1
+  Volume group "nova-volumes" successfully created
+root@opstack:~#
+
+Now the volume create .
+Proceed to Nova Installation.
+
+
+
